@@ -1,0 +1,87 @@
+ELK學習筆記(6) - ELK 搜尋語法
+ CEILING TSAI   星期二, 6月 12, 2018   ELK  , LINUX
+在kibana進行搜尋時，可以使用Lucene通用的語法，或者使用 JSON 格式 QueryDSL（DSL：Digital Subscriber Line）來進行各項搜尋請求。Apache Lucene 提供了方便的查詢方式，本文就來介紹一下 Lucene 查詢解析器支援的語法。
+
+
+
+
+[查詢欄位方式]
+
+(1) 使用冒號表示包含該值
+❋❋例如：status:active
+
+(2) 使用刮號，包含多個值
+❋❋例如：title:(quick OR brown)
+❋❋        ：title:(quick brown)
+
+(3) 查詢多字元使用雙引號刮起來
+❋❋例如：author:"John Smith"
+
+
+[特定字串]
+使用雙引號將查詢的一個字或字串引起來。
+❋❋例如："Mozilla/5.0"
+❋❋        ："like Gecko"
+
+
+[萬用字元]
+使用「?」表示取代單一個字元，「*」表示取代0 或多個字元，「.」可以用來表示任何字元
+「?  *」不能用作第一個字符，如：?text *text
+❋❋例如：qu?ck bro* , kiba?a, el*search
+❋❋例如：對於字符串"abcde"，ab... 符合，a.c.e 也符合
+❋❋        ：book.\*:(quick brown)，表示book.title, book.content或book.date 包含 quick 或 brown (需要用反斜線帶出*):
+
+一個或多個加號"+"可以用來重複一次或多次前面的最短模式。對於字符串"aaabbb"：
+❋❋例如：a + b +  符合
+❋❋        ：aa + bb + 符合
+❋❋        ：a +.+ 符合
+❋❋        ：aa + bbb +  符合
+
+
+
+
+[區間查詢方式]
+數值/時間/IP/字符串類型的字段可以對某一範圍進行查詢，使用 TO指令表示查詢起迄值，中刮號表示包含
+❋❋例如：date:[2012-01-01 TO 2012-12-31]
+                  count:[1 TO 5]
+                  length:[100 TO 200]
+                  sip:["172.24.20.110" TO "172.24.20.140"]
+                  host:["10.28.0.0" TO "10.28.0.255"]
+
+
+[排除某區間值]
+使用大刮號，表示排除，[ ]表示端點數值包含在範圍內，{ }表示端點數值不包含在範圍內，可以混合使用
+❋❋例如：tag:{alpha TO omega}，排除 alpha 跟 omega:
+❋❋        ：count:[10 TO *]，表示10以上
+❋❋        ：date:{* TO 2012-01-01}，表示日期在 2012年前
+❋❋        ：date:{"now-6h" TO "now"}
+❋❋        ：tag:{b TO e}     搜索b到e中間的字符
+❋❋        ：count:[10 TO *]    * 表示一端不限制範圍
+❋❋        ：count:[1 TO 5}     此語句為1到5，包括1，不包括5
+
+
+範圍可用以下表示式：
+age:>10
+age:>=10
+age:<10
+age:<=10
+
+
+[保留字]
+如果用到保留字作為查詢的條件之一，就要使用反斜線當作引導字元。
+保留字元包括：+ - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /
+❋❋例如：查詢 (1+1)=2,，就要寫成 \(1\+1\)\=2
+
+
+[布爾運算]
+布爾運算符（AND，OR，NOT）允許通過邏輯運算符組合多個子查詢。
+運算符AND/OR/NOT必須是大寫。
+
+直接在查詢結果的欄位處點擊放大鏡，＋表示查詢該值或－排除該值
+
+
+＋：搜索結果中必須包含此項
+－：不能含有此項
+❋❋例如：+apache -jakarta  結果中必須存在apache，不能有jakarta
+❋❋        ：title:(+return +"pink panther")
+❋❋        ：host:(baidu OR qq OR google) AND host:(com OR cn)   轉譯特殊字符

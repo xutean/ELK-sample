@@ -1,0 +1,14 @@
+
+https://github.com/twtrubiks/docker-elk-tutorial
+Docker 基本教學 - 從無到有 Docker-Beginners-Guide
+透過這篇文章，你將會學會
+docker ELK 環境建立
+透過 python 送 log 到 ELK
+logging for Django + ELK - Django 如何設定 logging 以及發送 logging 到 ELK 中
+docker logging + ELK - 將 docker logs 發送到 docker ELK 中
+
+ELK學習筆記(2)：在ElasticSearch匯入及查詢 Sample Data
+https://atceiling.blogspot.com/2018/05/linux3elasticsearch-sample-data.html
+
+input data to logstash directly
+nc localhost 5000 < README.md
